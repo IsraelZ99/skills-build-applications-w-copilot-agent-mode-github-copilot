@@ -5,15 +5,9 @@ import { Team } from './models/team.js';
 import { Activity } from './models/activity.js';
 import { Leaderboard } from './models/leaderboard.js';
 import { Workout } from './models/workout.js';
+import { apiUrl, codespaceName, host, mongoUri, port } from './config/database.js';
 
 const app = express();
-const port = 8000;
-const codespaceName = process.env.CODESPACE_NAME;
-const host = codespaceName ? '0.0.0.0' : 'localhost';
-const apiUrl = codespaceName
-  ? `https://${codespaceName}-8000.githubpreview.dev`
-  : `http://localhost:${port}`;
-const mongoUri = 'mongodb://127.0.0.1:27017/octofit_db';
 
 app.use(express.json());
 

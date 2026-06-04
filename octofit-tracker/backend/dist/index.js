@@ -1,54 +1,49 @@
 import express from 'express';
+import mongoose from 'mongoose';
+import { User } from './models/user.js';
+import { Team } from './models/team.js';
+import { Activity } from './models/activity.js';
+import { Leaderboard } from './models/leaderboard.js';
+import { Workout } from './models/workout.js';
+import { apiUrl, codespaceName, host, mongoUri, port } from './config/database.js';
 const app = express();
-const port = 8000;
-const codespaceName = process.env.CODESPACE_NAME;
-const host = codespaceName ? '0.0.0.0' : 'localhost';
-const apiUrl = codespaceName
-    ? `https://${codespaceName}-8000.githubpreview.dev`
-    : `http://localhost:${port}`;
 app.use(express.json());
-const users = [
-    { id: 'user-1', name: 'Ava', role: 'Runner', joined: '2026-01-12' },
-    { id: 'user-2', name: 'Kai', role: 'Cyclist', joined: '2026-02-03' },
-];
-const teams = [
-    { id: 'team-1', name: 'OctoRunners', members: 8 },
-    { id: 'team-2', name: 'FitForce', members: 12 },
-];
-const activities = [
-    { id: 'activity-1', user: 'Ava', type: 'Run', duration: 45, calories: 420 },
-    { id: 'activity-2', user: 'Kai', type: 'Cycle', duration: 60, calories: 550 },
-];
-const leaderboard = [
-    { rank: 1, user: 'Ava', score: 980 },
-    { rank: 2, user: 'Kai', score: 934 },
-];
-const workouts = [
-    { id: 'workout-1', title: 'Morning HIIT', durationMinutes: 30, level: 'Intermediate' },
-    { id: 'workout-2', title: 'Recovery Yoga', durationMinutes: 20, level: 'Beginner' },
-];
 app.get('/api/health', (_req, res) => {
     res.json({ status: 'ok', message: 'OctoFit Tracker backend is running.' });
 });
 app.get('/api/config', (_req, res) => {
-    res.json({ apiUrl, codespaceName: codespaceName || null });
+    res.json({ apiUrl, codespaceName: codespaceName || null, mongoUri });
 });
-app.get('/api/users/', (_req, res) => {
+app.get('/api/users/', async (_req, res) => {
+    const users = await User.find().sort({ joined: -1 });
     res.json({ users });
 });
-app.get('/api/teams/', (_req, res) => {
+app.get('/api/teams/', async (_req, res) => {
+    const teams = await Team.find().sort({ name: 1 });
     res.json({ teams });
 });
-app.get('/api/activities/', (_req, res) => {
+app.get('/api/activities/', async (_req, res) => {
+    const activities = await Activity.find().sort({ date: -1 });
     res.json({ activities });
 });
-app.get('/api/leaderboard/', (_req, res) => {
+app.get('/api/leaderboard/', async (_req, res) => {
+    const leaderboard = await Leaderboard.find().sort({ rank: 1 });
     res.json({ leaderboard });
 });
-app.get('/api/workouts/', (_req, res) => {
+app.get('/api/workouts/', async (_req, res) => {
+    const workouts = await Workout.find().sort({ durationMinutes: 1 });
     res.json({ workouts });
 });
-app.listen(port, host, () => {
-    console.log(`OctoFit Tracker backend listening on ${host}:${port}`);
-    console.log(`API URL: ${apiUrl}`);
+mongoose
+    .connect(mongoUri)
+    .then(() => {
+    app.listen(port, host, () => {
+        console.log(`OctoFit Tracker backend listening on ${host}:${port}`);
+        console.log(`API URL: ${apiUrl}`);
+        console.log(`Connected to MongoDB at ${mongoUri}`);
+    });
+})
+    .catch((error) => {
+    console.error('MongoDB connection error:', error);
+    process.exit(1);
 });

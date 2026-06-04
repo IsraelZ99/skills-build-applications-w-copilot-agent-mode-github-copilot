@@ -1,11 +1,10 @@
 import mongoose from 'mongoose';
-import { User } from '../models/user';
-import { Team } from '../models/team';
-import { Activity } from '../models/activity';
-import { Leaderboard } from '../models/leaderboard';
-import { Workout } from '../models/workout';
-
-const mongoUri = 'mongodb://127.0.0.1:27017/octofit_db';
+import { User } from '../models/user.js';
+import { Team } from '../models/team.js';
+import { Activity } from '../models/activity.js';
+import { Leaderboard } from '../models/leaderboard.js';
+import { Workout } from '../models/workout.js';
+import { mongoUri } from '../config/database.js';
 
 async function seed() {
   console.log('Seed the octofit_db database with test data');
