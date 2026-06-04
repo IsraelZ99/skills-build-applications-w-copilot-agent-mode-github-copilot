@@ -1,11 +1,10 @@
 import express, { Request, Response } from 'express';
-import mongoose from 'mongoose';
 import { User } from './models/user.js';
 import { Team } from './models/team.js';
 import { Activity } from './models/activity.js';
 import { Leaderboard } from './models/leaderboard.js';
 import { Workout } from './models/workout.js';
-import { apiUrl, codespaceName, host, mongoUri, port } from './config/database.js';
+import { apiUrl, codespaceName, host, connectToDatabase, mongoUri, port } from './config/database.js';
 
 const app = express();
 
@@ -44,8 +43,7 @@ app.get('/api/workouts/', async (_req: Request, res: Response) => {
   res.json({ workouts });
 });
 
-mongoose
-  .connect(mongoUri)
+connectToDatabase()
   .then(() => {
     app.listen(port, host, () => {
       console.log(`OctoFit Tracker backend listening on ${host}:${port}`);
